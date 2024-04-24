@@ -1,0 +1,11 @@
+.filmElement{
+    display: flex;
+    flex-direction: row;
+    margin: 40px;
+    width: 500px;
+}
+.listOfFilms{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
