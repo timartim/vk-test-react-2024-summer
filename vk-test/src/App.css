@@ -4,3 +4,7 @@
   display: flex;
 }
 
+.buttonList{
+  display: flex;
+  justify-content: center;
+}
