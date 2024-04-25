@@ -6,7 +6,7 @@ countries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
 function Profile(args){
     const [movies, setMovies] = useState([]);
     const [activeMovie, setActiveMovie] = useState(null);
-    const [currentMovieId, setMovieId] = useState(0)
+    const [currentMovie, setMovieId] = useState({})
     function Modal({ isOpen, onClose, children }) {
         if (!isOpen) return null;
 
@@ -15,7 +15,16 @@ function Profile(args){
                 <div className="modal-content">
                     <span className="close" onClick={onClose}>&times;</span>
                     {children}
-                    <span>{currentMovieId}</span>
+                    <div className="movieInformation">
+                        <ul>
+                            <li>Описание: {currentMovie.overview}</li>
+                            <li>Рейтинг: {currentMovie.vote_average}</li>
+                            <li>Количество проголосовавших:{currentMovie.vote_count}</li>
+                            <li>Дата выхода: {currentMovie.release_date}</li>
+                        </ul>
+
+                    </div>
+
                 </div>
                 <div className="modal-overlay" onClick={onClose} />
             </div>
@@ -23,10 +32,10 @@ function Profile(args){
     }
     const handleOpenModal = (movie) => {
         if(movie){
-            setMovieId(movie.overview)
+            setMovieId(movie)
         }
 
-        setActiveMovie(movie);
+        setActiveMovie(movie.id);
     }
 
     const getData = useCallback(() => {
