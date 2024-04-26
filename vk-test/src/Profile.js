@@ -16,20 +16,23 @@ function Profile(args){
                     <span className="close" onClick={onClose}>&times;</span>
                     {children}
                     <div className="movieInformation">
-                        <ul>
-                            <li>Описание: {currentMovie.overview}</li>
-                            <li>Рейтинг: {currentMovie.vote_average}</li>
-                            <li>Количество проголосовавших:{currentMovie.vote_count}</li>
-                            <li>Дата выхода: {currentMovie.release_date}</li>
-                        </ul>
-
+                        <div>
+                            <h1>{currentMovie.vote_average} {currentMovie.title}</h1>
+                            <h3>{currentMovie.original_title}</h3>
+                            {currentMovie.overview}
+                            <br />
+                            <b>Дата выхода</b>: {currentMovie.release_date}
+                        </div>
+                        <img src={`https://image.tmdb.org/t/p/w300${currentMovie.poster_path}`}
+                             alt="Постер недоступен"/>
                     </div>
 
                 </div>
-                <div className="modal-overlay" onClick={onClose} />
+                <div className="modal-overlay" onClick={onClose}/>
             </div>
         );
     }
+
     const handleOpenModal = (movie) => {
         if(movie){
             setMovieId(movie)
