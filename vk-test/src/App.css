@@ -1,10 +1,47 @@
-.movieHeaderText{
+.movieHeaderText {
   background-color: orangered;
   color: white;
   display: flex;
 }
-
-.buttonList{
+.buttonList {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.buttonList button {
+  background-color: antiquewhite;
+  color: black;
+  border: 2px solid #8B8378;
+  border-radius: 10px;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.buttonList button.currentPage {
+  background-color: #C8B9A5;
+  color: white;
+}
+
+.buttonList button:hover {
+  background-color: #8B8378;
+  color: white;
+  transform: scale(1.05);
+}
+
+.buttonList button.active {
+  border-color: #5C4033;
+  font-weight: bold;
+}
+@media (max-width: 600px) {
+  .buttonList button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .buttonList {
+    gap: 5px;
+  }
 }

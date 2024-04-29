@@ -32,12 +32,13 @@
 }
 
 .modal-content {
-
     background-color: white;
     padding: 20px;
     border-radius: 5px;
     position: relative;
     animation: modalFadeIn 0.5s ease-out forwards;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 .filmElement:hover {
     background: antiquewhite;
@@ -72,6 +73,17 @@
 .movieInformation{
     display: flex;
     flex-direction: row;
-
 }
-
+.similarMovies{
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.similarElement {
+    padding: 10px;
+    border: 1px solid #5C4033;
+    border-radius: 10px;
+    background-color: antiquewhite;
+    max-width: 200px;
+    overflow-wrap: break-word;
+}

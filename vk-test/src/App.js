@@ -1,43 +1,62 @@
 import './App.css';
 import './Profile'
 import Profile from "./Profile";
-import {useState} from "react";
+import {useState, useEffect} from "react";
+const MIN_PAGES = 1;
 function App() {
     const [page, setPage] = useState(1)
-    function updatePage(updatePage){
-        setPage(updatePage)
+    const [MAX_PAGES, setMaxPages] = useState(400);
+    function updatePage(newPage) {
+        if (newPage < MIN_PAGES) {
+            alert('Это первая страница, вы не можете перейти на предыдущую!');
+        } else if (newPage > MAX_PAGES) {
+            alert('Это последняя страница, вы не можете перейти на следующую!');
+        } else {
+            setPage(newPage);
+            localStorage.setItem('currentPage', newPage);
+        }
     }
     function getButtonIds(){
-        let minPage = Math.max(page - 5, 1)
+        let minPage = Math.max(page - 4, MIN_PAGES)
         let ids = [];
-        for(let i = minPage; i < minPage + 10; i++){
+        for(let i = minPage; i < Math.min(minPage + 8, MAX_PAGES); i++){
             ids.push(i);
         }
         return ids;
     }
     function ButtonList() {
-        return <div className="buttonList">
-            <button onClick={() => {
-                updatePage(page - 1)
-            }}>Предыдущая страница
-            </button>
-            {getButtonIds().map((element) => {
-                return <button onClick={() => {
-                    updatePage(element)
-                }}>{element}</button>
-            })}
-            <button onClick={() => {
-                updatePage(page + 1)
-            }}>Следующая страница
-            </button>
-        </div>
+        return (
+            <div className="buttonList">
+                <button onClick={() => updatePage(page - 1)} disabled={page === MIN_PAGES}>Предыдущая страница</button>
+                <button onClick={() => updatePage(1)}>На первую страницу</button>
+                {getButtonIds().map((element) => {
+                    console.log(page, element)
+                    return (
+                        <button
+                            key={element}
+                            className={page === element ? "currentPage" : ""}
+                            onClick={() => updatePage(element)}
+                        >
+                            {element}
+                        </button>
+                    );
+                })}
+                <button onClick={() => updatePage(page + 1)} disabled={page === MAX_PAGES}>Следующая страница</button>
+            </div>
+        );
     }
 
+    useEffect(() => {
+        const savedPage = localStorage.getItem('currentPage');
+        if (savedPage) {
+            setPage(Number(savedPage));
+        }
+    }, []);
     return (
         <div>
-            <span className={'Популярные фильмы'}>Кино справочник</span>
+            <span className={'popularMovies'}>Кино справочник</span>
             <ButtonList />
-            <Profile currentPage={page}/>
+            <Profile currentPage={page} setMaxPages={setMaxPages}/>
             <ButtonList />
       </div>
     );

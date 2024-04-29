@@ -6,10 +6,51 @@ countries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
 function Profile(args){
     const [movies, setMovies] = useState([]);
     const [activeMovie, setActiveMovie] = useState(null);
-    const [currentMovie, setMovieId] = useState({})
-    function Modal({ isOpen, onClose, children }) {
-        if (!isOpen) return null;
+    const [activeMovieInformation, setActiveMovieInformation] = useState({})
+    const [similarMoviesInformation, setSimilarMoviesInformation] = useState([])
+    const numberFormat = new Intl.NumberFormat('en-US', {
+        style: 'decimal',
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+    });
+    function posterMovieInformation(movie) {
+        return  <>
+                    <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                         alt="Постер недоступен"/>
+                    <div className="fileElementShortDiscription">
+                        <h1>{movie.title}</h1>
+                        <h3>{movie.original_title}</h3>
+                    </div>
+                </>
+    }
+    function formatDate(dateString) {
+        const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+        const dateParts = dateString.split("-");
 
+        const year = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10);
+        const day = parseInt(dateParts[2], 10);
+
+        return `${day}-ое ${months[month - 1]} ${year}-го года`;
+    }
+
+    function Modal({isOpen, onClose, children}) {
+        useEffect(() => {
+            const handleKeyDown = (event) => {
+                if (event.key === 'Escape') {
+                    onClose();
+                }
+            };
+
+            if (isOpen) {
+                window.addEventListener('keydown', handleKeyDown);
+            }
+
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        }, [isOpen, onClose]);
+        if (!isOpen) return null;
         return (
             <div className="modal">
                 <div className="modal-content">
@@ -17,14 +58,36 @@ function Profile(args){
                     {children}
                     <div className="movieInformation">
                         <div>
-                            <h1>{currentMovie.vote_average} {currentMovie.title}</h1>
-                            <h3>{currentMovie.original_title}</h3>
-                            {currentMovie.overview}
+                            <h1>{numberFormat.format(activeMovieInformation.vote_average)} {activeMovieInformation.title}</h1>
+                            <h3>{activeMovieInformation.original_title}</h3>
+                            {activeMovieInformation.overview}
+                            <br/>
+                            <b>Дата выхода</b>: {formatDate(activeMovieInformation.release_date)}
+                            <br/>
+                            <b>Жанры:</b>
+                            {activeMovieInformation.genres && activeMovieInformation.genres.map((elem, index) => {
+                                    if (index !== activeMovieInformation.genres.length - 1) {
+                                        return `${elem.name}, `
+                                    } else {
+                                        return `${elem.name}`
+                                    }
+                                }
+                            )}
+                            <br/>
+                            <b>Длительность:</b> {activeMovieInformation.runtime ? `${activeMovieInformation.runtime} мин.` : 'Неизвестно'}
                             <br />
-                            <b>Дата выхода</b>: {currentMovie.release_date}
+                            <b>Популярность: </b> {numberFormat.format(activeMovieInformation.popularity)}
                         </div>
-                        <img src={`https://image.tmdb.org/t/p/w300${currentMovie.poster_path}`}
+                        <img src={`https://image.tmdb.org/t/p/w300${activeMovieInformation.poster_path}`}
                              alt="Постер недоступен"/>
+                    </div>
+                    <h2>Похожие фильмы</h2>
+                    <div className="similarMovies">
+                        {similarMoviesInformation.slice(0, 5).map((element, index) =>
+                            <div className="similarElement" key={element.id}> {}
+                                {posterMovieInformation(element)}
+                            </div>
+                        )}
                     </div>
 
                 </div>
@@ -34,15 +97,13 @@ function Profile(args){
     }
 
     const handleOpenModal = (movie) => {
-        if(movie){
-            setMovieId(movie)
+        if (movie && activeMovie !== movie.id) {
+            getMovieInformation(movie.id)
         }
-
-        setActiveMovie(movie.id);
-    }
-
-    const getData = useCallback(() => {
-        const url = `https://api.themoviedb.org/3/movie/top_rated?language=ru&page=${args.currentPage}`;
+    };
+    const getMovieInformation = useCallback((movieId) => {
+        const movieInformationUrl = `https://api.themoviedb.org/3/movie/${movieId}?language=ru`;
+        const similarInformationUrl = `https://api.themoviedb.org/3/movie/${movieId}/similar?language=ru`;
         const options = {
             method: 'GET',
             headers: {
@@ -51,14 +112,39 @@ function Profile(args){
             }
         };
 
+        Promise.all([
+            fetch(movieInformationUrl, options).then(res => res.json()),
+            fetch(similarInformationUrl, options).then(res => res.json())
+        ]).then(([movieInfo, similarMovies]) => {
+            setActiveMovieInformation(movieInfo);
+            setActiveMovie(movieId);
+            setSimilarMoviesInformation(similarMovies.results);
+        }).catch(err => console.error('error:' + err));
+    }, []);
+
+
+
+    const getMovieList = useCallback(() => {
+        const url = `https://api.themoviedb.org/3/movie/top_rated?language=ru&page=${args.currentPage}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2ZWE3M2Y5YTdmZjY0MzExNTk3Zjk5OWJlZmRhMmNhYSIsInN1YiI6IjY2MjdhNDdkNjJmMzM1MDE3ZGRjNTE1YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.dZ508YPKqdWCJcU9igCaQKktVqM9I-4m8LOwHAsyDmM'
+            }
+        };
         fetch(url, options)
             .then(res => res.json())
-            .then(json => {console.log(json); setMovies(json.results)})
+            .then(json => {setMovies(json.results); args.setMaxPages(json.total_pages)})
             .catch(err => console.error('error:' + err));
+
     }, [args])
+
     useEffect(() => {
-        getData();
-    }, [getData]);
+        getMovieList();
+    }, [getMovieList]);
+
+
     return (
         <div>
             <h1>Popular Movies</h1>
@@ -66,12 +152,7 @@ function Profile(args){
                 {movies.map((movie,index) => (
                     <button className="filmElement" onClick={() => handleOpenModal(movie)}>
                         <h1>{index + (args.currentPage - 1) * 20 + 1}) </h1>
-                        <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                             alt="Постер недоступен"/>
-                        <div className="fileElementShortDiscription">
-                             <h1>{movie.title}</h1>
-                             <h2>{movie.original_title}</h2>
-                        </div>
+                        {posterMovieInformation(movie)}
                     </button>
                 ))}
             </div>
