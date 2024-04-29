@@ -24,10 +24,10 @@ function Profile(args){
         maximumFractionDigits: 1
     });
     function posterMovieInformation(movie) {
-        return  <div className="file">
+        return  <div className="film">
             <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                  alt="Постер недоступен"/>
-            <div className="fileElementShortDiscription">
+            <div className="filmElementShortDiscription">
                 <h1>{movie.title}</h1>
                 <h3>{movie.original_title}</h3>
             </div>
@@ -164,8 +164,11 @@ function Profile(args){
                 <div className="listOfFilms">
                     {movies.map((movie, index) => (
                         <button className="filmElement" onClick={() => handleOpenModal(movie)} key={movie.id}>
-                            <h1>{index + (args.currentPage - 1) * 20 + 1}) </h1>
-                            {posterMovieInformation(movie)}
+                            <div className="filmElementWithNumber">
+                                <h1>{index + (args.currentPage - 1) * 20 + 1}</h1>
+                                {posterMovieInformation(movie)}
+                            </div>
+
                         </button>
                     ))}
                 </div>

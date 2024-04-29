@@ -7,7 +7,10 @@
     width: 500px;
     border-radius: 10px;
     transition: background 0.3s ease;
+    justify-content: center;
+    align-items: center;
 }
+
 .modal {
     position: fixed;
     top: 0;
@@ -66,13 +69,16 @@
     flex-wrap: wrap;
 }
 
-.fileElementShortDiscription {
+.filmElementShortDiscription {
     background-color: inherit;
     border: none;
 }
 .movieInformation{
     display: flex;
     flex-direction: row;
+}
+.film{
+    justify-self: center;
 }
 .similarMovies{
     display: flex;
@@ -87,7 +93,6 @@
     max-width: 200px;
     overflow-wrap: break-word;
 }
-
 @media (max-width: 768px) {
     .movieInformation img {
         width: 200px;
@@ -103,3 +108,4 @@
         margin: 8px 0;
     }
 }
+
